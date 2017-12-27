@@ -1,4 +1,4 @@
-import cPickle as pickle
+import pickle
 import os
 
 from redis import StrictRedis
