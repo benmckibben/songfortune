@@ -1,0 +1,4 @@
+#!/usr/bin/env python
+
+import songfortune
+songfortune.data_utils.refresh_cache()
