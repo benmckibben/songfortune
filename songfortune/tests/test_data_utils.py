@@ -85,4 +85,7 @@ class TestGetData(BaseDataUtilsTestCase):
         self.mock_redis_client.get.return_value = None
         self.mock_musixmatch.get_chart.return_value = []
         self.assertEqual(get_data(), [])
-        self.mock_redis_client.set.assert_called_once()
+        self.mock_redis_client.set.assert_called_once_with(
+            CACHE_KEY,
+            pickle.dumps([]),
+        )
