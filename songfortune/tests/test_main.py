@@ -55,7 +55,7 @@ class TestMain(unittest.TestCase):
                 },
                 'lyrics': '''Dear daddy,
                 I write you
-                In spite of years of silence''',
+                ****** This Lyrics is NOT for Commercial use *******''',
             },
         ]
         mock_get_data.return_value = sample_data
