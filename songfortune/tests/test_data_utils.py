@@ -1,5 +1,6 @@
 import pickle
 import unittest
+from datetime import datetime
 try:
     from unittest import mock
 except ImportError:
@@ -7,6 +8,7 @@ except ImportError:
 
 import songfortune
 from songfortune.data_utils import CACHE_KEY
+from songfortune.data_utils import LAST_UPDATED_KEY
 from songfortune.data_utils import _get_data_from_db
 from songfortune.data_utils import _get_data_from_musixmatch
 from songfortune.data_utils import _store_data_in_db
@@ -20,6 +22,11 @@ class BaseDataUtilsTestCase(unittest.TestCase):
 
         self.mock_musixmatch = mock.Mock()
         songfortune.data_utils.musixmatch = self.mock_musixmatch
+
+        self.mock_datetime = mock.Mock()
+        songfortune.data_utils.datetime = self.mock_datetime
+        self.test_now = datetime.now()
+        self.mock_datetime.now.return_value = self.test_now
 
 
 class TestGetDataFromDb(BaseDataUtilsTestCase):
@@ -40,19 +47,19 @@ class TestStoreDataInDb(BaseDataUtilsTestCase):
     def test_empty_cache(self):
         pickled_sample = pickle.dumps(None)
         _store_data_in_db(None)
-        self.mock_redis_client.set.assert_called_once_with(
-            CACHE_KEY,
-            pickled_sample,
-        )
+        self.mock_redis_client.set.assert_has_calls([
+            mock.call(CACHE_KEY, pickled_sample),
+            mock.call(LAST_UPDATED_KEY, pickle.dumps(self.test_now)),
+        ])
 
     def test_non_empty_cache(self):
         sample_data = ['This', 'is', {'some': 'sample'}, 'data', {4: 'u'}]
         pickled_sample = pickle.dumps(sample_data)
         _store_data_in_db(sample_data)
-        self.mock_redis_client.set.assert_called_once_with(
-            CACHE_KEY,
-            pickled_sample,
-        )
+        self.mock_redis_client.set.assert_has_calls([
+            mock.call(CACHE_KEY, pickled_sample),
+            mock.call(LAST_UPDATED_KEY, pickle.dumps(self.test_now)),
+        ])
 
 
 class TestGetDataFromMusixmatch(BaseDataUtilsTestCase):
@@ -85,7 +92,7 @@ class TestGetData(BaseDataUtilsTestCase):
         self.mock_redis_client.get.return_value = None
         self.mock_musixmatch.get_chart.return_value = []
         self.assertEqual(get_data(), [])
-        self.mock_redis_client.set.assert_called_once_with(
-            CACHE_KEY,
-            pickle.dumps([]),
-        )
+        self.mock_redis_client.set.assert_has_calls([
+            mock.call(CACHE_KEY, pickle.dumps([])),
+            mock.call(LAST_UPDATED_KEY, pickle.dumps(self.test_now)),
+        ])
