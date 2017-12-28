@@ -27,7 +27,7 @@ class TestGetTrackArtist(unittest.TestCase):
 class TestGetRandomLyric(unittest.TestCase):
     def test_get_lyric(self):
         lyrics = '''This is a made up lyric.
-        I am the best songwriter la la laaaaa.'''
+        ******* This Lyrics is NOT for Commercial use *******'''
         expected_result = 'This is a made up lyric.'
         self.assertEqual(
             _get_random_lyric(lyrics),
@@ -36,6 +36,10 @@ class TestGetRandomLyric(unittest.TestCase):
 
     def test_get_single_lyric(self):
         lyrics = 'I am but a single lyric'
+        self.assertEqual(_get_random_lyric(lyrics), lyrics)
+
+    def test_only_pesky_notice(self):
+        lyrics = '****** This Lyrics is NOT for Commercial use *******'
         with self.assertRaises(IndexError):
             _get_random_lyric(lyrics)
 

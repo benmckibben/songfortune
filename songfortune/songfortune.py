@@ -9,7 +9,13 @@ def _get_track_artist(track):
     return track['artist_name']
 
 def _get_random_lyric(lyrics):
-    lyrics_split = lyrics.split('\n')[:-1]  # splice out copyright notice
+    lyrics_split = lyrics.split('\n')
+
+    # Take out the pesky notice.
+    lyrics_split = [
+        x for x in lyrics_split
+        if 'This Lyrics is NOT for Commercial use'.lower() not in x.lower()
+    ]
     return random.choice(lyrics_split).strip()
 
 # -- public
