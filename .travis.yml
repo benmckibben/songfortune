@@ -1,28 +1,15 @@
 sudo: required
-
 language: python
-
-services: docker
-
 python:
-  - "3.3"
-  - "3.4"
-  - "3.5"
-  - "3.6"
-  - "nightly"
-
-before_install:
-  - docker build -t songfortune .
-
+- '3.3'
+- '3.4'
+- '3.5'
+- '3.6'
+- nightly
 install:
-  - pip install -r requirements.txt
-
+- pip install -r requirements.txt
 script:
-  - pytest
-
-after_success:
-  - if [ "$TRAVIS_BRANCH" == "master" ]; then
-    docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
-    docker tag songfortune benmckibben/songfortune:latest;
-    docker push benmckibben/songfortune:latest;
-    fi
+- pytest
+notifications:
+  slack:
+    secure: ywtS1VLJyok0uVEgF2kk7r0mRAmsFX8Fu+1y3Ohp6lZOJu1qBFpFY7Xt2p4WVdKJqoxba6wjuBi1mWRRYSYJINqgWqblvxWvfJ1xjmZ6O/84mgEKA+Q4hoa4J9lFlynn3mjRA4+Ez3ygGOv8wKY+x+Efg/b0/11cYnnbaFTjpxlr0VwWwBI4rInZzb9nFa5WzYy17hOjhzMH106fO3fZsp5jE3OAb1VLzhLCHht/vNnGuwWHEBBohpTwWZ4X5mwEwfddvfq1BdDGDiiWK8RDaqivHjZyVowAXNq6nNHD3fO1xiKRBKdpsKCRRn7DfkM/YArDU9IR2mLjbP2mjCuJ1IqPaRJb4WX4FePtL2TreMFvIRPV3M4cSj0VEXwUUdXWT60bVP8olVvIUqQoBl0KA+9R1Fsl4g/baceV4blTs8MVJZUW91cH0fDZI40XAdrpdpIlZWH5kEOF/84cA3CqB03gZSrTf3+h1M89CWLO4JbhV2WaBDrlW4VKjgY7P4EjmSB+zcIspJePXBhCOkmduj0kicCC01QhQ7/lZYLTj6QUoWbAX1Y/cETfxKFjYnJ2B5/nY5mgQhuln7GaZRZo0NJj27dpoJKVhjVpJq4TGy/vw8tm7JfaIAvENWWU3dcwKK0rBojy7YJu1a4qmJOQiOwJQpUhEF61KS7eLk1gaVA=
