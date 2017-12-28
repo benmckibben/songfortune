@@ -14,10 +14,9 @@ def index():
 
 
 @hug.cli()
-@hug.get('/refresh')
 def refresh():
     try:
         sf.data_utils.refresh_cache()
-        return {'success': True}
+        return 'Cache refresh succeeded.'
     except:
-        return {'success': False}
+        return 'Cache refresh failed.'
