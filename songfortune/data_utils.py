@@ -44,6 +44,7 @@ def get_data():
     data = _get_data_from_db()
     if not data:
         data = _get_data_from_musixmatch()
+        _store_data_in_db(data)
     
     return data
 

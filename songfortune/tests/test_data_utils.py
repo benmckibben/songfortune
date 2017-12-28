@@ -6,10 +6,11 @@ except ImportError:
     import mock
 
 import songfortune
+from songfortune.data_utils import CACHE_KEY
 from songfortune.data_utils import _get_data_from_db
 from songfortune.data_utils import _get_data_from_musixmatch
 from songfortune.data_utils import _store_data_in_db
-from songfortune.data_utils import CACHE_KEY
+from songfortune.data_utils import get_data
 
 
 class BaseDataUtilsTestCase(unittest.TestCase):
@@ -77,3 +78,11 @@ class TestGetDataFromMusixmatch(BaseDataUtilsTestCase):
         self.mock_musixmatch.get_chart.return_value = sample_chart
         self.mock_musixmatch.get_track_lyrics.side_effect = ['A', 'B']
         self.assertEqual(_get_data_from_musixmatch(), expected_result)
+
+
+class TestGetData(BaseDataUtilsTestCase):
+    def test_cache_after_musixmatch_fetch(self):
+        self.mock_redis_client.get.return_value = None
+        self.mock_musixmatch.get_chart.return_value = []
+        self.assertEqual(get_data(), [])
+        self.mock_redis_client.set.assert_called_once()
