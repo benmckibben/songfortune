@@ -12,7 +12,7 @@ python:
   - "nightly"
 
 before_install:
-  - docker build -t benmckibben/songfortune:latest .
+  - docker build -t songfortune .
 
 install:
   - pip install -r requirements.txt
@@ -23,5 +23,6 @@ script:
 after_success:
   - if [ "$TRAVIS_BRANCH" == "master" ]; then
     docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
-    docker push benmckibben/songfortune:latest
+    docker tag songfortune benmckibben/songfortune:latest;
+    docker push benmckibben/songfortune:latest;
     fi
