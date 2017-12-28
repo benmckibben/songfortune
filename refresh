@@ -1,4 +1,2 @@
-#!/usr/bin/env python
-
-import songfortune
-songfortune.data_utils.refresh_cache()
+#!/usr/bin/env bash
+hug -f api.py -c refresh
