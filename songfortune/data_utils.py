@@ -12,12 +12,12 @@ redis_client = StrictRedis.from_url(os.environ.get('REDIS_URL', 'redis://localho
 CACHE_KEY = 'songfortune:cache'
 LAST_UPDATED_KEY = 'songfortune:lastupdated'
 
+
 # -- private
 
 def _get_data_from_db():
     # Check when the cache was last updated.
-    last_updated = redis_client.get(LAST_UPDATED_KEY)
-    last_updated = pickle.loads(last_updated) if last_updated else None
+    last_updated = get_last_updated()
 
     # Force a cache refresh if there is no last updated time or if the cache is
     # older than a day.
@@ -31,12 +31,14 @@ def _get_data_from_db():
 
     return pickle.loads(cache)
 
+
 def _store_data_in_db(cache):
     pickled_cache = pickle.dumps(cache)
     redis_client.set(CACHE_KEY, pickled_cache)
 
     pickled_now = pickle.dumps(datetime.now())
     redis_client.set(LAST_UPDATED_KEY, pickled_now)
+
 
 def _get_data_from_musixmatch():
     # get the track data from musixmatch
@@ -53,16 +55,23 @@ def _get_data_from_musixmatch():
 
     return data
 
+
 # -- public
 
-def get_data():
-    data = _get_data_from_db()
-    if not data:
-        data = _get_data_from_musixmatch()
-        _store_data_in_db(data)
-    
-    return data
+def get_last_updated():
+    last_updated = redis_client.get(LAST_UPDATED_KEY)
+    return pickle.loads(last_updated) if last_updated else None
+
 
 def refresh_cache():
     data = _get_data_from_musixmatch()
     _store_data_in_db(data)
+    return data
+
+
+def get_data():
+    data = _get_data_from_db()
+    if not data:
+        data = refresh_cache()
+
+    return data
