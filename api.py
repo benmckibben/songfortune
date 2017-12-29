@@ -20,3 +20,9 @@ def refresh():
         return 'Cache refresh succeeded.'
     except:
         return 'Cache refresh failed.'
+
+
+@hug.cli()
+@hug.get('/last_updated')
+def last_updated():
+    return {'last_updated': sf.data_utils.get_last_updated()}
