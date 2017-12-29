@@ -1,11 +1,8 @@
 import pickle
-import unittest
 from datetime import datetime
 from datetime import timedelta
-try:
-    from unittest import mock
-except ImportError:
-    import mock
+from unittest import mock
+from unittest import TestCase
 
 import songfortune
 from songfortune.data_utils import CACHE_KEY
@@ -16,7 +13,7 @@ from songfortune.data_utils import _store_data_in_db
 from songfortune.data_utils import get_data
 
 
-class BaseDataUtilsTestCase(unittest.TestCase):
+class BaseDataUtilsTestCase(TestCase):
     def setUp(self):
         self.mock_redis_client = mock.Mock()
         songfortune.data_utils.redis_client = self.mock_redis_client

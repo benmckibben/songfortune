@@ -1,15 +1,12 @@
-import unittest
-try:
-    from unittest import mock
-except ImportError:
-    import mock
+from unittest import mock
+from unittest import TestCase
 
 from songfortune.songfortune import _get_random_lyric
 from songfortune.songfortune import _get_track_artist
 from songfortune.songfortune import main
 
 
-class TestGetTrackArtist(unittest.TestCase):
+class TestGetTrackArtist(TestCase):
     def test_single_track(self):
         sample_track = {
             'artist_name': 'Kesha',
@@ -24,7 +21,7 @@ class TestGetTrackArtist(unittest.TestCase):
             _get_track_artist({})
     
 
-class TestGetRandomLyric(unittest.TestCase):
+class TestGetRandomLyric(TestCase):
     def test_get_lyric(self):
         lyrics = '''This is a made up lyric.
         ******* This Lyrics is NOT for Commercial use *******'''
@@ -44,7 +41,7 @@ class TestGetRandomLyric(unittest.TestCase):
             _get_random_lyric(lyrics)
 
 
-class TestMain(unittest.TestCase):
+class TestMain(TestCase):
     @mock.patch('songfortune.data_utils.get_data')
     def test_main(self, mock_get_data):
         sample_data = [
