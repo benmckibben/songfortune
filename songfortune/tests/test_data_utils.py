@@ -1,6 +1,7 @@
 import pickle
 import unittest
 from datetime import datetime
+from datetime import timedelta
 try:
     from unittest import mock
 except ImportError:
@@ -30,17 +31,43 @@ class BaseDataUtilsTestCase(unittest.TestCase):
 
 
 class TestGetDataFromDb(BaseDataUtilsTestCase):
-    def test_get_no_data(self):
+    def test_no_last_updated(self):
         self.mock_redis_client.get.return_value = None
         self.assertEqual(_get_data_from_db(), None)
-        self.mock_redis_client.get.assert_called_once_with(CACHE_KEY)
+        self.mock_redis_client.get.assert_called_once_with(LAST_UPDATED_KEY)
 
-    def test_get_some_data(self):
+    def test_no_cache(self):
+        self.mock_redis_client.get.side_effect = [
+            pickle.dumps(self.test_now),
+            None,
+        ]
+        self.assertEqual(_get_data_from_db(), None)
+        self.mock_redis_client.get.assert_has_calls([
+            mock.call(LAST_UPDATED_KEY),
+            mock.call(CACHE_KEY),
+        ])
+
+    def test_nonempty_current_cache(self):
         sample_data = ['This', 'is', 'a', 6, 'length', 'list']
-        pickled_sample = pickle.dumps(sample_data)
-        self.mock_redis_client.get.return_value = pickled_sample
+        self.mock_redis_client.get.side_effect = [
+            pickle.dumps(self.test_now),
+            pickle.dumps(sample_data),
+        ]
         self.assertEqual(_get_data_from_db(), sample_data)
-        self.mock_redis_client.get.assert_called_once_with(CACHE_KEY)
+        self.mock_redis_client.get.assert_has_calls([
+            mock.call(LAST_UPDATED_KEY),
+            mock.call(CACHE_KEY),
+        ])
+
+    def test_outdated_cache(self):
+        two_days_ago = self.test_now - timedelta(days=2)
+        sample_data = ['This', 'is', 'a', 6, 'length', 'list']
+        self.mock_redis_client.get.side_effect = [
+            pickle.dumps(two_days_ago),
+            pickle.dumps(sample_data),
+        ]
+        self.assertEqual(_get_data_from_db(), None)
+        self.mock_redis_client.get.assert_called_once_with(LAST_UPDATED_KEY)
 
 
 class TestStoreDataInDb(BaseDataUtilsTestCase):

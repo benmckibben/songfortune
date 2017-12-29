@@ -1,6 +1,7 @@
 import pickle
 import os
 from datetime import datetime
+from datetime import timedelta
 
 from redis import StrictRedis
 
@@ -14,11 +15,20 @@ LAST_UPDATED_KEY = 'songfortune:lastupdated'
 # -- private
 
 def _get_data_from_db():
+    # Check when the cache was last updated.
+    last_updated = redis_client.get(LAST_UPDATED_KEY)
+    last_updated = pickle.loads(last_updated) if last_updated else None
+
+    # Force a cache refresh if there is no last updated time or if the cache is
+    # older than a day.
+    if last_updated is None or datetime.now() - last_updated > timedelta(days=1):
+        return None
+
     cache = redis_client.get(CACHE_KEY)
 
-    if cache == None:
+    if cache is None:
         return None
-    
+
     return pickle.loads(cache)
 
 def _store_data_in_db(cache):
