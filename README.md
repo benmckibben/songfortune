@@ -47,7 +47,7 @@ gunicorn api:__hug_wsgi__
 ```
 
 ### Docker
-Docker builds automatically execute and are pushed to `benmckibben/songfortune:latest` with each push to master here. However, this Docker image does not run the server automatically. You will need to both export the environment variables and run the server however you choose to deploy the image as defined in this repository's `Dockerfile`. Here is an example of deploying both songfortune and the Redis instance using [Docker Compose](https://docs.docker.com/compose/):
+Docker builds automatically execute and are pushed to `benmckibben/songfortune:latest` with each push to master here. You will need to export the environment variables however you choose to deploy the image as defined in this repository's `Dockerfile`. Here is an example of deploying both songfortune and the Redis instance using [Docker Compose](https://docs.docker.com/compose/):
 ```yaml
 version: "3"
 services:
@@ -70,7 +70,6 @@ services:
     environment:
       - REDIS_URL=redis://redis/
       - MUSIXMATCH_API_KEY=XXXXXXXXXXXXX
-    command: gunicorn api:__hug_wsgi__ -b 0.0.0.0:8000
     ports:
       - "8000:8000"
     networks:
